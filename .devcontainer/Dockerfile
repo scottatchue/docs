@@ -20,20 +20,19 @@ RUN if [ "${INSTALL_NODE}" = "true" ]; then su vscode -c "source /usr/local/shar
 # RUN pip3 --disable-pip-version-check --no-cache-dir install -r /tmp/pip-tmp/requirements.txt \
 #    && rm -rf /tmp/pip-tmp
 
-# [Optional] Uncomment this section to install additional OS packages.
-# RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
-#     && apt-get -y install --no-install-recommends <your-package-list-here>
-
 # latest gatsby, yarn
 RUN su vscode -c "source /usr/local/share/nvm/nvm.sh \
     && npm install -g gatsby-cli \
     && npm install -g yarn" 2>&1
 
 # Enable docker-in-docker (see: https://github.com/microsoft/vscode-dev-containers/blob/master/script-library/docs/docker-in-docker.md)
+# Install git-lfs
 COPY library-scripts/*.sh /tmp/library-scripts/
 RUN wget -O- https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
     && apt-get update \ 
-    && /bin/bash /tmp/library-scripts/docker-in-docker-debian.sh
+    && /bin/bash /tmp/library-scripts/docker-in-docker-debian.sh \
+    && apt-get -y install --no-install-recommends git-lfs
+
 ENTRYPOINT ["/usr/local/share/docker-init.sh"]
 VOLUME [ "/var/lib/docker" ]
 CMD ["sleep", "infinity"]
